@@ -1,15 +1,42 @@
 pipeline {
-     agent any  
+     agent {
+	     label 'slave'
+		 }
 	 stages {
-	     stage("clone code") {
+	     stage('Compile') {
 		     steps {
-			     git credentialsId: 'git_credentials', url: 'https://github.com/gabrielf/maven-samples.git'
+			       echo "Compiled sucessfully !";
+				   }
+			}
+		 stage('JUnit') {
+		    steps {
+			       echo "Junit passed successfully!";
+				   }
+			}
+			stage('Qulaity gate') {
+		    steps {
+			       echo "quality gate passed successfully!";
+				   }
+			}
+			stage('Deploy') {
+		    steps {
+			       echo "Pass";
+				   }
 			}
 		}
-        stage("build code") {
-		    steps {
-			   sh "mvn clean install"
+		post {
+		   always {
+		       echo 'This will always run' 
+		    }
+			success {
+			    echo 'This will run only if failed'
+			}
+			failure {
+			     echo 'This will run only if failed'
+			}
+			unstable {
+			     echo 'This will run only if the run was marked as unstable' 
 			}
 		}
 	}
-}			
+			
