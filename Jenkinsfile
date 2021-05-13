@@ -1,41 +1,33 @@
 pipeline {
-     agent {
-	     label 'slave'
-		 }
+     agent none
 	 stages {
-	     stage('Compile') {
-		     steps {
-			       echo "Compiled sucessfully !";
-				   }
+	     stage('Non-parallel stage') {
+		     agent {
+			          label 'master'
+					}
+			 steps {
+			        echo "This stage will be executed first"
+					}
 			}
-		 stage('JUnit') {
-		    steps {
-			       echo "Junit passed successfully!";
-				   }
-			}
-			stage('Qulaity gate') {
-		    steps {
-			       echo "quality gate passed successfully!";
-				   }
-			}
-			stage('Deploy') {
-		    steps {
-			       echo "Pass";
-				   }
-			}
-		}
-		post {
-		   always {
-		       echo 'This will always run' 
-		    }
-			success {
-			    echo 'This will run only on sucess'
-			}
-			failure {
-			     echo 'This will run only if failed'
-			}
-			unstable {
-			     echo 'This will run only if the run was marked as unstable' 
+           stage('Run tests') {
+		       parallel {
+			        stage('Test on slave') {
+					    agent {
+						     label 'slave'
+						}
+						steps {
+						   echo "Task running on agent"
+						}
+					}
+					stage('Test on master') {
+					    agent {
+						    label 'master'
+						}
+						steps {
+						    echo "Task1 on master"
+						}
+					}
+				}
 			}
 		}
-	}
+	}	
